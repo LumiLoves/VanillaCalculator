@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>계산기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" type="text/css" href="src/css/index.css">
+</head>
+<body>
+
+  <article class="calculator-box" id="calc-a">
+    <h1 class="calculator-title blind">계산기 위젯</h1>
+
+    <table class="calculator-buttons">
+      <colgroup>
+        <col class="column">
+        <col class="column">
+        <col class="column">
+        <col class="column">
+      </colgroup>
+
+      <tbody>
+        <tr>
+          <th colspan="3"><input type="text" class="screen" readonly></th>
+          <th><button type="button" class="button function-key" value="R">R</button></th>
+        </tr>
+        <tr>
+          <td><button type="button" class="button digit-key" value="1">1</button></td>
+          <td><button type="button" class="button digit-key" value="2">2</button></td>
+          <td><button type="button" class="button digit-key" value="3">3</button></td>
+          <td><button type="button" class="button operator-key" value="+">+</button></td>
+        </tr>
+        <tr>
+          <td><button type="button" class="button digit-key" value="4">4</button></td>
+          <td><button type="button" class="button digit-key" value="5">5</button></td>
+          <td><button type="button" class="button digit-key" value="6">6</button></td>
+          <td><button type="button" class="button operator-key" value="-">-</button></td>
+        </tr>
+         <tr>
+          <td><button type="button" class="button digit-key" value="7">7</button></td>
+          <td><button type="button" class="button digit-key" value="8">8</button></td>
+          <td><button type="button" class="button digit-key" value="9">9</button></td>
+          <td><button type="button" class="button operator-key" value="*">*</button></td>
+        </tr>
+        <tr>
+          <td><button type="button" class="button function-key" value=".">.</button></td>
+          <td><button type="button" class="button digit-key" value="0">0</button></td>
+          <td><button type="button" class="button operator-key" value="=">=</button></td>
+          <td><button type="button" class="button operator-key" value="/">/</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+
+  <article class="calculator-box" id="calc-b">
+    <h1 class="calculator-title blind">계산기 위젯</h1>
+
+    <table class="calculator-buttons">
+      <colgroup>
+        <col width="25%" />
+        <col width="25%" />
+        <col width="25%" />
+        <col width="25%" />
+      </colgroup>
+
+      <tbody>
+        <tr>
+          <th colspan="3"><input type="text" class="screen" readonly></th>
+          <th><button type="button" class="button function-key" value="R">R</button></th>
+        </tr>
+        <tr>
+          <td><button type="button" class="button digit-key" value="1">1</button></td>
+          <td><button type="button" class="button digit-key" value="2">2</button></td>
+          <td><button type="button" class="button digit-key" value="3">3</button></td>
+          <td><button type="button" class="button operator-key" value="+">+</button></td>
+        </tr>
+        <tr>
+          <td><button type="button" class="button digit-key" value="4">4</button></td>
+          <td><button type="button" class="button digit-key" value="5">5</button></td>
+          <td><button type="button" class="button digit-key" value="6">6</button></td>
+          <td><button type="button" class="button operator-key" value="-">-</button></td>
+        </tr>
+         <tr>
+          <td><button type="button" class="button digit-key" value="7">7</button></td>
+          <td><button type="button" class="button digit-key" value="8">8</button></td>
+          <td><button type="button" class="button digit-key" value="9">9</button></td>
+          <td><button type="button" class="button operator-key" value="*">*</button></td>
+        </tr>
+        <tr>
+          <td><button type="button" class="button function-key" value=".">.</button></td>
+          <td><button type="button" class="button digit-key" value="0">0</button></td>
+          <td><button type="button" class="button operator-key" value="=">=</button></td>
+          <td><button type="button" class="button operator-key" value="/">/</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+
+  <script src="src/js/calculator.js"></script>
+  <script src="src/js/index.js"></script>
+</body>
+</html>
