@@ -4,16 +4,14 @@
  *  validator
  */
 
-var validator = {
-  isOverNumberLength: function(number) {
-    var LIMITED_NUMBER_LENGTH = 10;
-    var result = (!number)? false : (number.toString().length >= LIMITED_NUMBER_LENGTH);
+const clacValidator = {
+  isOverNumberLength: (number, limitLength) => {
+    const result = (!number)? false : (number.toString().length >= limitLength);
     return result;
   },
-  isOverDecimalPointLength: function(number) {
-    var LIMITED_DECIMAL_POINT_LENGTH = 5;
-    var belowPointNumber = number.toString().split('.')[1];
-    var result = (!belowPointNumber)? false : (belowPointNumber >= LIMITED_DECIMAL_POINT_LENGTH);
+  isOverDecimalPointLength: (number, limitLength) => {
+    const belowPointNumber = number.toString().split('.')[1];
+    const result = (!belowPointNumber)? false : (belowPointNumber.length >= limitLength);
     return result;
   }
 };
@@ -23,88 +21,74 @@ var validator = {
  *  ERROR_MSG
  */
 
-var ERROR_MSG = (function(displayHandler) {
-  var LIMITED_NUMBER_LENGTH = '숫자는 10자까지 입력할 수 있습니다.';
-  var LIMITED_DECIMAL_POINT_LENGTH = '소수점 이하 5자까지 입력할 수 있습니다.';
+const ERROR_MSG = ((displayHandler) => {
+  const LIMITED_NUMBER_LENGTH = '숫자는 10자까지 입력할 수 있습니다.';
+  const LIMITED_DECIMAL_POINT_LENGTH = '소수점 이하 5자까지 입력할 수 있습니다.';
 
   return {
     show: displayHandler,
-    isOverNumberLength: function() { return LIMITED_NUMBER_LENGTH; },
-    isOverDecimalPointLength: function() { return LIMITED_DECIMAL_POINT_LENGTH; }
+    isOverNumberLength: () => LIMITED_NUMBER_LENGTH,
+    isOverDecimalPointLength: () => LIMITED_DECIMAL_POINT_LENGTH
   };
-})(function(msg) { console.warn(msg); });
-
+})((msg) => { console.warn(msg); });
 
 
 /**
  *  Calculator
  */
 
-function Calculator() {
-  this.validator = validator;
-  this.ERROR_MSG = ERROR_MSG;
+function Calculator(validator, errorMsg) {
+  this.validator = clacValidator;
+  this.ERROR_MSG = errorMsg;
   this.resetAllData();
 }
 
-Calculator.prototype.add = function(x, y) {
-  return parseFloat(x, 10) + parseFloat(y, 10);
-};
+Calculator.prototype = {
+  resetAllData() {
+    this.currentNumber = null;
+    this.firstNumber = null;
+    this.operator = null;
+    this.secondNumber = null;
+    this.resultNumber = null;
+  },
+  
+  add(x, y) { return parseFloat(x, 10) + parseFloat(y, 10); },
+  substract(x, y) { return parseFloat(x, 10) - parseFloat(y, 10); },
+  multiply(x, y) { return parseFloat(x, 10) * parseFloat(y, 10); },
+  divide(x, y) { return parseFloat(x, 10) / parseFloat(y, 10); },
 
-Calculator.prototype.substract = function(x, y) {
-  return parseFloat(x, 10) - parseFloat(y, 10);
-};
+  updateCurrentNumber(number) {
+    const n = parseFloat(number, 10);
+    const LIMITED_NUMBER_LENGTH = 10;
+    const isZero = (!this.currentNumber && !n);
+    const isOverNumberLength = this.validator.isOverNumberLength(this.currentNumber, LIMITED_NUMBER_LENGTH);
 
-Calculator.prototype.multiply = function(x, y) {
-  return parseFloat(x, 10) * parseFloat(y, 10);
-};
+    if (isZero) { return false; }
+    if (isOverNumberLength) {
+      ERROR_MSG.show(ERROR_MSG.isOverNumberLength());
+      return false;
+    }
 
-Calculator.prototype.divide = function(x, y) {
-  return parseFloat(x, 10) / parseFloat(y, 10);
-};
-
-Calculator.prototype.resetAllData = function() {
-  this.currentNumber = null;
-  this.firstNumber = null;
-  this.operator = null;
-  this.secondNumber = null;
-  this.resultNumber = null;
-};
-
-Calculator.prototype.updateCurrentNumber = function(number) {
-  var number = parseFloat(number, 10);
-  var isZero = (!this.currentNumber && !number);
-  var isOverNumberLength = validator.isOverNumberLength(this.currentNumber);
-
-  if (isZero) { return false; }
-  if (isOverNumberLength) {
-    ERROR_MSG.show(ERROR_MSG.isOverNumberLength());
-    return false;
+    this.currentNumber = n;
+  },
+  _resetCurrentNumber() {
+    this.currentNumber = null;
+  },
+  saveFirstNumber(number) {
+    this.firstNumber = number || this.currentNumber;
+    this._resetCurrentNumber();
+  },
+  saveSecondNumber(number) {
+    this.secondNumber = number || this.currentNumber;
+    this._resetCurrentNumber();
+  },
+  saveOperator(operator) {
+    this.operator = operator;
+  },
+  saveResultNumber(resultNumber) {
+    this.resultNumber = resultNumber;
   }
-
-  this.currentNumber = number;
-};
-
-Calculator.prototype._resetCurrentNumber = function() {
-  this.currentNumber = null;
-};
-
-Calculator.prototype.saveFirstNumber = function(number) {
-  this.firstNumber = number || this.currentNumber;
-  this._resetCurrentNumber();
-};
-
-Calculator.prototype.saveSecondNumber = function(number) {
-  this.secondNumber = number || this.currentNumber;
-  this._resetCurrentNumber();
-};
-
-Calculator.prototype.saveOperator = function(operator) {
-  this.operator = operator;
-};
-
-Calculator.prototype.saveResultNumber = function(resultNumber) {
-  this.resultNumber = resultNumber;
-};
+}
 
 
 /**
@@ -116,22 +100,21 @@ function CalcViewer(displayHandler, refreshHandler) {
   this.refreshHandler = refreshHandler;
 }
 
-CalcViewer.prototype.displayValue = function(number) {
-  var numberForViewer = this._handleValue(number);
-  this.displayHandler(numberForViewer);
-};
-
-CalcViewer.prototype._handleValue = function(number) {
-  var resultNumber = (!number) ? 0 : this._numberWithComma(number);
-  return resultNumber;
-}
-
-CalcViewer.prototype._numberWithComma = function(number) {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-CalcViewer.prototype.refresh = function() {
-  this.refreshHandler && this.refreshHandler();
+CalcViewer.prototype = {
+  displayValue(number) {
+    const numberForViewer = this._handleValue(number);
+    this.displayHandler(numberForViewer);
+  },
+  _handleValue(number) {
+    const resultNumber = (!number)? 0 : this._numberWithComma(number);
+    return resultNumber;
+  },
+  _numberWithComma(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  },
+  refresh() {
+    this.refreshHandler && this.refreshHandler();
+  }
 };
 
 
@@ -139,124 +122,126 @@ CalcViewer.prototype.refresh = function() {
  *  CalculatorManager
  */
 
-function CalculatorManager(obj) {
-  this.keyBoxElem = obj.keyBoxElem;
-  this.calculator = new Calculator();
-  this.viewer = new CalcViewer(obj.displayHandler);
+function CalculatorManager(opt) {
+  const validator = opt.validator || clacValidator;
+  const errorMsg = opt.errorMsg || ERROR_MSG;
 
-  this._reset();  
+  this.calculator = new Calculator(validator, errorMsg);
+  this.viewer = new CalcViewer(opt.displayHandler);
+  this.dom = {
+    wrapper: opt.dom.wrapper,
+    numbers: opt.dom.numbers || opt.dom.wrapper.querySelectorAll('[data-role="number"]'),
+    operators: opt.dom.operators || opt.dom.wrapper.querySelectorAll('[data-role="operator"]'),
+    pointer: opt.dom.pointer || opt.dom.wrapper.querySelector('[data-role="pointer"]'),
+    result: opt.dom.result || opt.dom.wrapper.querySelector('[data-role="result"]'),
+    reset: opt.dom.reset || opt.dom.wrapper.querySelector('[data-role="reset"]')
+  };
+
+  this._reset();
 }
 
-CalculatorManager.prototype.registerEvent = function() {
-  this.keyBoxElem.addEventListener('click', function(e) {
-    e.preventDefault();
-
-    var calculator = this.calculator;
-    var viewer = this.viewer;
-
-    var thisValue = e.target.value;
-    var isNumber = /^[0-9]*$/.test(thisValue);
-    var isPointer = (thisValue === '.');
-    var isOperator = ['+', '-', '*', '/'].indexOf(thisValue) > - 1;
-    var isResult = (thisValue === '=');
-    var isReset = (thisValue === 'R');
-
-    if (!(isNumber || isOperator || isPointer || isResult || isReset)) { return false; }
-
-    if (isNumber) {
-      this._updateNumber(thisValue);
-      return;
-    }
-
-    if (isPointer) {
+CalculatorManager.prototype = {
+  registerEvent() {
+    this.dom.wrapper.addEventListener('click', (e) => {
+      e.target.classList.contains('button') && e.preventDefault();
+    });
+    this._registerEventToNumberKey();
+    this._registerEventToOperatorKey();
+    this._registerEventToPointerKey();
+    this._registerEventToResultKey();
+    this._registerEventToResetKey();
+  },
+  _registerEventToNumberKey() {
+    this.dom.numbers.forEach((elem) => {
+      elem.addEventListener('click', ({ target }) => {
+        this._updateNumber(target.dataset.value);
+      });
+    });
+  },
+  _registerEventToOperatorKey() {
+    this.dom.operators.forEach((elem) => {
+      elem.addEventListener('click', ({ target }) => {
+        this._updateOperator(target.dataset.value);
+      });
+    });
+  },
+  _registerEventToPointerKey() {
+    this.dom.pointer.addEventListener('click', ({ target }) => {
       this._changeDecimal();
-      return;
-    }
-
-    if (isOperator) {
-      this._updateOperator(thisValue);
-      return;
-    }
-
-    if (isResult) {
+    });
+  },
+  _registerEventToResultKey() {
+    this.dom.result.addEventListener('click', ({ target }) => {
       this._calculateResult();
-      return;
-    }
-
-    if (isReset) {
+    });
+  },
+  _registerEventToResetKey() {
+    this.dom.reset.addEventListener('click', ({ target }) => {
       this._reset();
-      return;
+    });
+  },
+  _updateNumber(attachedNumber) {
+    const calc = this.calculator;
+    const viewer = this.viewer;
+    let currentNumber = calc.currentNumber;
+    let resultNumber;
+    
+    currentNumber = (currentNumber)? currentNumber.toString() : '';
+    resultNumber = currentNumber + attachedNumber;
+
+    if (calc.resultNumber) { calc.resetAllData(); }
+    calc.updateCurrentNumber(resultNumber);
+    viewer.displayValue(calc.currentNumber);
+  },
+  _changeDecimal() {
+    const calc = this.calculator;
+    const viewer = this.viewer;
+    let currentNumber = calc.currentNumber;
+    const isInteger = parseInt(currentNumber, 10) === currentNumber;
+    let resultNumber;
+
+    currentNumber = (currentNumber)? currentNumber.toString() : '0';
+    resultNumber = currentNumber + '.';
+
+    calc.updateCurrentNumber(resultNumber);
+    viewer.displayValue(resultNumber);
+  },
+  _updateOperator(operator) {
+    const calc = this.calculator;
+    const viewer = this.viewer;
+
+    calc.saveFirstNumber();
+    calc.saveOperator(operator);
+    viewer.refresh();
+  },
+  _calculateResult() {
+    const calc = this.calculator;
+    const viewer = this.viewer;
+    const operatorFunc = {
+      '+': 'add',
+      '-': 'substract',
+      '*': 'multiply',
+      '/': 'divide'
+    }[calc.operator];
+    let resultNumber;
+
+    if (typeof calc[operatorFunc] !== 'function') { return; }
+
+    if (calc.currentNumber) {
+      calc.saveSecondNumber();
+      resultNumber = calc[operatorFunc](calc.firstNumber, calc.secondNumber);
+    } else {
+      resultNumber = calc[operatorFunc](calc.resultNumber, calc.secondNumber);
     }
-  }.bind(this));
-};
 
-CalculatorManager.prototype._updateNumber = function(attachedNumber) {
-  var calc = this.calculator;
-  var viewer = this.viewer;
-  var currentNumber = calc.currentNumber;
-  var resultNumber;
-  
-  currentNumber = (currentNumber)? currentNumber.toString() : '';
-  resultNumber = currentNumber + attachedNumber;
+    calc.saveResultNumber(resultNumber);
+    viewer.displayValue(calc.resultNumber);
+  },
+  _reset() {
+    const calc = this.calculator;
+    const viewer = this.viewer;
 
-  if (calc.resultNumber) { calc.resetAllData(); }
-  calc.updateCurrentNumber(resultNumber);
-  viewer.displayValue(calc.currentNumber);
-};
-
-CalculatorManager.prototype._changeDecimal = function() {
-  var calc = this.calculator;
-  var viewer = this.viewer;
-  var currentNumber = calc.currentNumber;
-  var isInteger = parseInt(currentNumber, 10) === currentNumber;
-  var resultNumber;
-
-  currentNumber = (currentNumber)? currentNumber.toString() : '0';
-  resultNumber = currentNumber + '.';
-
-  calc.updateCurrentNumber(resultNumber);
-  viewer.displayValue(resultNumber);
-};
-
-CalculatorManager.prototype._updateOperator = function(operator) {
-  var calc = this.calculator;
-  var viewer = this.viewer;
-
-  calc.saveFirstNumber();
-  calc.saveOperator(operator);
-  viewer.refresh();
-}
-
-CalculatorManager.prototype._calculateResult = function() {
-  var calc = this.calculator;
-  var viewer = this.viewer;
-  var operatorFunc = {
-    '+': 'add',
-    '-': 'substract',
-    '*': 'multiply',
-    '/': 'divide'
-  }[calc.operator];
-  var resultNumber;
-
-  if (typeof calc[operatorFunc] !== 'function') { return; }
-
-  if (calc.currentNumber) {
-    calc.saveSecondNumber();
-    resultNumber = calc[operatorFunc](calc.firstNumber, calc.secondNumber);
-  } else {
-    resultNumber = calc[operatorFunc](calc.resultNumber, calc.secondNumber);
+    calc.resetAllData();
+    viewer.displayValue();
   }
-
-  calc.saveResultNumber(resultNumber);
-  viewer.displayValue(calc.resultNumber);
 };
-
-CalculatorManager.prototype._reset = function() {
-  var calc = this.calculator;
-  var viewer = this.viewer;
-
-  calc.resetAllData();
-  viewer.displayValue();
-};
-
-

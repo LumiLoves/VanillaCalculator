@@ -1,36 +1,36 @@
 'use strict';
 
-// Data
-var calcAInfo = {
-  keyBoxElem: document.querySelector('#calc-a .calculator-buttons'),
-  viewerElem: document.querySelector('#calc-a .screen')
-};
+function main() {
+  const calcAWrapper = document.querySelector('#calc-a');
+  const calcBWrapper = document.querySelector('#calc-b');
+ 
+  const calcA = new CalculatorManager({
+    validator: clacValidator,
+    errorMsg: ERROR_MSG,
+    dom: {
+      wrapper: calcAWrapper,
+      numbers: calcAWrapper.querySelectorAll('[data-role="number"]'),
+      operators: calcAWrapper.querySelectorAll('[data-role="operator"]'),
+      pointer: calcAWrapper.querySelector('[data-role="pointer"]'),
+      result: calcAWrapper.querySelector('[data-role="result"]'),
+      reset: calcAWrapper.querySelector('[data-role="reset"]')
+    },
+    displayHandler: function(output) {
+      calcAWrapper.querySelector('.screen').value = output;
+    }
+  });
 
-var calcBInfo = {
-  keyBoxElem: document.querySelector('#calc-b .calculator-buttons'),
-  viewerElem: document.querySelector('#calc-b .screen')
-};
+  const calcB = new CalculatorManager({
+    dom: {
+      wrapper: calcBWrapper
+    },
+    displayHandler: function(output) {
+      calcBWrapper.querySelector('.screen').value = output;
+    }
+  });
 
-
-// Instance
-var calcA = new CalculatorManager({
-  keyBoxElem: calcAInfo.keyBoxElem,
-  displayHandler: function(output) {
-    calcAInfo.viewerElem.value = output;
-  }
-});
-
-var calcB = new CalculatorManager({
-  keyBoxElem: calcBInfo.keyBoxElem,
-  displayHandler: function(output) {
-    calcBInfo.viewerElem.value = output;
-  }
-});
-
-
-
-
-document.addEventListener('DOMContentLoaded', function(e) {
   calcA.registerEvent();
   calcB.registerEvent();
-});
+}
+
+document.addEventListener('DOMContentLoaded', main);

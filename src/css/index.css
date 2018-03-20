@@ -35,4 +35,4 @@
 }
 .calculator-buttons .button:active { opacity: 0.7; } 
 .calculator-buttons .button:focus { outline: none; }
-.calculator-buttons .digit-key { background: lightblue;  }
+.calculator-buttons [data-role="number"] { background: lightblue;  }
